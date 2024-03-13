@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -g -Wall -std=c++17
 
-CXX_SRCS = main.cpp
+CXX_SRCS = main.cpp Cache.cpp
 CXX_OBJS = $(CXX_SRCS:.cpp=.o)
 
 
@@ -15,3 +15,6 @@ csim : $(CXX_OBJS) $(C_OBJS)
 solution.zip :
 	rm -f $@
 	zip -9r $@ *.cpp *.h README.txt Makefile
+
+clean :
+	rm -f csim *.o
