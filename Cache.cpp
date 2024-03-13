@@ -1,10 +1,9 @@
 #include <string>
 #include <iostream>
 #include "Cache.h"
-using namespace std; 
 
-Cache::Cache(int num_sets,  int num_blocks, int num_bytes, string alloc, string through_back, string lru_fifo)
-    : num_sets(num_sets),
+Cache::Cache(int num_sets,  int num_blocks, int num_bytes, std::string alloc, std::string through_back, std::string lru_fifo)
+    :   num_sets(num_sets),
         num_blocks(num_blocks),
         num_bytes(num_bytes),
         alloc(alloc),
@@ -16,18 +15,19 @@ Cache::Cache(int num_sets,  int num_blocks, int num_bytes, string alloc, string 
         load_misses(0),
         store_hits(0),
         store_misses(0),
-        total_cycles(0)
+        total_cycles(0),
+        sets(num_sets, Set(num_blocks)) // initialize sets with blocks
 {}
 
 
 void Cache::printStats() {
-    cout << "Total loads: " << total_loads << "\n";
-    cout << "Total stores: " << total_stores << "\n";
-    cout << "Load hits: " << load_hits << "\n";
-    cout << "Load misses: " << load_misses << "\n";
-    cout << "Store hits: " << store_hits << "\n";
-    cout << "Store misses: " << store_misses << "\n";
-    cout << "Total cycles: " << total_cycles << "\n";
+    std::cout << "Total loads: " << total_loads << "\n";
+    std::cout << "Total stores: " << total_stores << "\n";
+    std::cout << "Load hits: " << load_hits << "\n";
+    std::cout << "Load misses: " << load_misses << "\n";
+    std::cout << "Store hits: " << store_hits << "\n";
+    std::cout << "Store misses: " << store_misses << "\n";
+    std::cout << "Total cycles: " << total_cycles << "\n";
 
    
 }

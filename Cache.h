@@ -1,15 +1,18 @@
+#ifndef CACHE_H
+#define CACHE_H
 
+#include "Set.h"
 #include <string>
-using namespace std; 
+#include <vector>
 
 class Cache {
     private: //should cache parameters be private instead? Would need a lot of getter methods
         int num_sets;
         int num_blocks;
         int num_bytes;
-        string alloc;
-        string through_back;
-        string lru_fifo;
+        std::string alloc;
+        std::string through_back;
+        std::string lru_fifo;
 
         //stats
         int total_loads;
@@ -20,10 +23,13 @@ class Cache {
         int store_misses;
         int total_cycles;
 
+        //cache is a vector containing sets
+        std::vector<Set> sets;;
+
     public:
     //public methods and constructor declarations
         //constructor for Cache
-        Cache(int num_sets, int num_blocks, int num_bytes, string alloc, string through_back, string lru_fifo);
+        Cache(int num_sets, int num_blocks, int num_bytes, std::string alloc, std::string through_back, std::string lru_fifo);
 
 
         //method to print stats
@@ -32,3 +38,4 @@ class Cache {
         //add more methods
 
 };
+#endif
