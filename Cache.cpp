@@ -33,36 +33,60 @@ void Cache::printStats() {
 
 void Cache::store(uint32_t set_index, uint32_t tag) {
 //cache store method (store to memory)
-    //check if block in cache has matching tag and is valid (refactor into lookup method, which returns hit or miss)
-    //if cache hit, increment total store hits, update lru "timestamps"
-    //if its a miss
-         //check if its write-allocate. If yes, bring block into the cache before store proceeds
-        // increment total store misses
-
-    //check if its write-through: write to both cache and memory
-    //if write-back: write to cache only and mark block as dirty
+    //check if block in cache has matching tag and is valid 
+    if (lookup(set_index, tag) == "hit") {
+        store_hits++;
+        //if its a hit, can we return here?
+        //update lru
+    } else { //miss
+        store_misses++;
+        if (alloc == "write-allocate") {
+            //bring block into cache before store proceeds
+        }
     
+    }
+    //check if its write-through: write to both cache and memory
+    if (through_back == "write-back") {
+        //write to cache only and mark block as dirty
+        total_cycles++;
+    } else if (through_back == "write-through") {
+        //write to both cache and memory
+        total_cycles += 100;
+    }
+    //add functionality to update lru "timestamps"   
     //update cycles: stores to cache take 1 cycle, stores to memory take 100 cycles for every 4 bytes
-    //increment total_stores
+    // add in functionality to set block to valid if added to the Cache
     total_stores++;
 }
 
-void Cache::load(uint32_t set_index, uint32_t tag) {
-   
+
 //cache load method (load data from memory)
-    //check if block in cache has matching tag and is valid (hit), else miss (refactor into lookup method, which returns hit or miss)
-        //if hit
-            //update lru "timestamps",  increment load hits
+void Cache::load(uint32_t set_index, uint32_t tag) { 
+    //check if block in cache has matching tag and is valid (hit), else miss 
+   if (lookup(set_index, tag) == "hit") {
+        load_hits++;
+        total_cycles++; //loads from cache take 1 cycle
+        //update lru "timestamps"?
+   } else { 
+        load_misses++;
+        total_cycles += 100; // loads from memory take 100 cycles per 4 bytes
+        //functionality to "load" data from memory (find matching block, set tag, valid, load_ts??)
+   }
 
-         //else increment load_misses 
-
-    //update cycles: loads from cache take 1 cycle, loads from memory take 100 cycles for every 4 bytes
-    //increment total loads
-    total_loads++;
+    total_loads++;  //increment total loads
 }
 
 
 //TODO: implement lookup method to refactor code out of store and load
+std::string Cache::lookup(uint32_t set_index, uint32_t tag) {
+    for (Block block : sets[set_index].get_blocks()) { //iterate through blocks in matching set to search for match
+        if (block.get_tag() == tag && block.is_valid()) {// if block in matching set in Cache has matching tag and is valid
+            return "hit";
+        } 
+    }
+    return "miss"; //no matching block found
+}
 
 //TODO: add lru logic (method?)
 
+//note: currently, total cycles above the accurate amount because we haven't actually implemented functionality to "move" memory to cache

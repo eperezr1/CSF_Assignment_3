@@ -13,6 +13,7 @@ class Set {
     Set(int num_blocks);
     
     //get block method?
+    std::vector<Block> get_blocks();
 };
 
 #endif

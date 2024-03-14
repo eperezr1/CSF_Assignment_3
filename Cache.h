@@ -41,7 +41,7 @@ class Cache {
         void store(uint32_t set_index, uint32_t tag);
 
         //TODO: add lookup method 
-
+        std::string lookup(uint32_t set_index, uint32_t tag);
         //TODO: add lru logic (method?)
 
 };

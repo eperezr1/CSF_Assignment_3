@@ -7,3 +7,14 @@ Block::Block(uint32_t t, bool v, uint32_t lts, uint32_t ats)
 
 
 
+uint32_t Block::get_tag() {
+  return tag;
+}
+
+bool Block::is_valid(){
+  return valid;
+}
+
+void Block:: set_valid(bool t_f) {
+  valid = t_f;
+}
