@@ -28,6 +28,41 @@ void Cache::printStats() {
     std::cout << "Store hits: " << store_hits << "\n";
     std::cout << "Store misses: " << store_misses << "\n";
     std::cout << "Total cycles: " << total_cycles << "\n";
-
-   
 }
+
+
+void Cache::store(uint32_t set_index, uint32_t tag) {
+//cache store method (store to memory)
+    //check if block in cache has matching tag and is valid (refactor into lookup method, which returns hit or miss)
+    //if cache hit, increment total store hits, update lru "timestamps"
+    //if its a miss
+         //check if its write-allocate. If yes, bring block into the cache before store proceeds
+        // increment total store misses
+
+    //check if its write-through: write to both cache and memory
+    //if write-back: write to cache only and mark block as dirty
+    
+    //update cycles: stores to cache take 1 cycle, stores to memory take 100 cycles for every 4 bytes
+    //increment total_stores
+    total_stores++;
+}
+
+void Cache::load(uint32_t set_index, uint32_t tag) {
+   
+//cache load method (load data from memory)
+    //check if block in cache has matching tag and is valid (hit), else miss (refactor into lookup method, which returns hit or miss)
+        //if hit
+            //update lru "timestamps",  increment load hits
+
+         //else increment load_misses 
+
+    //update cycles: loads from cache take 1 cycle, loads from memory take 100 cycles for every 4 bytes
+    //increment total loads
+    total_loads++;
+}
+
+
+//TODO: implement lookup method to refactor code out of store and load
+
+//TODO: add lru logic (method?)
+

@@ -69,17 +69,16 @@ int main(int argc, char **argv) {
         uint32_t tag = address / num_sets;
 
         //use set_index and tag to see if there is cache hit or miss?
-        //implement lookup method?
+        //implement lookup method? 
 
-        //if first field is store, call function
-        /*
+        
         if (command == "s") {
-
+            cache.store(set_index,tag);
+        
         } else if (command == "l") {
-
+            cache.load(set_index, tag);
         }
-        */
-        //if first field is load, call function
+        
         
         
     }

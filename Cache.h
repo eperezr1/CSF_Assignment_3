@@ -36,6 +36,13 @@ class Cache {
         void printStats();
 
         //add more methods
+        void load(uint32_t set_index, uint32_t tag);
+
+        void store(uint32_t set_index, uint32_t tag);
+
+        //TODO: add lookup method 
+
+        //TODO: add lru logic (method?)
 
 };
 #endif
