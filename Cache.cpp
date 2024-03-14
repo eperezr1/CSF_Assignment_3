@@ -16,6 +16,7 @@ Cache::Cache(int num_sets,  int num_blocks, int num_bytes, std::string alloc, st
         store_hits(0),
         store_misses(0),
         total_cycles(0),
+        timestamp(0),
         sets(num_sets, Set(num_blocks)) // initialize sets with blocks
 {}
 
@@ -36,12 +37,17 @@ void Cache::store(uint32_t set_index, uint32_t tag) {
     //check if block in cache has matching tag and is valid 
     if (lookup(set_index, tag) == "hit") {
         store_hits++;
+        int block_index = get_block_index(set_index, tag);
+        sets[set_index].get_block(block_index).update_access_ts(timestamp);
         //if its a hit, can we return here?
         //update lru
     } else { //miss
         store_misses++;
         if (alloc == "write-allocate") {
             //bring block into cache before store proceeds
+            //find an empty block in the set, make into method?
+            //if an empty block is found, update the block with tag and set valid to true
+            //if write-back, mark block as dirty
         }
     
     }
@@ -56,6 +62,7 @@ void Cache::store(uint32_t set_index, uint32_t tag) {
     //add functionality to update lru "timestamps"   
     //update cycles: stores to cache take 1 cycle, stores to memory take 100 cycles for every 4 bytes
     // add in functionality to set block to valid if added to the Cache
+    timestamp++;
     total_stores++;
 }
 
@@ -79,7 +86,9 @@ void Cache::load(uint32_t set_index, uint32_t tag) {
 
 //TODO: implement lookup method to refactor code out of store and load
 std::string Cache::lookup(uint32_t set_index, uint32_t tag) {
-    for (Block block : sets[set_index].get_blocks()) { //iterate through blocks in matching set to search for match
+    Set& cache_set = sets[set_index];
+    for (int i = 0; i < num_blocks; ++i) { //iterate through blocks in matching set to search for match
+        Block& block = cache_set.get_block(i);
         if (block.get_tag() == tag && block.is_valid()) {// if block in matching set in Cache has matching tag and is valid
             return "hit";
         } 
@@ -90,3 +99,15 @@ std::string Cache::lookup(uint32_t set_index, uint32_t tag) {
 //TODO: add lru logic (method?)
 
 //note: currently, total cycles above the accurate amount because we haven't actually implemented functionality to "move" memory to cache
+
+//helper method to get block index provided index and tag
+int Cache::get_block_index(uint32_t set_index, uint32_t tag) {
+    Set& cache_set = sets[set_index];
+    for (int i = 0; i < num_blocks; ++i) { 
+        Block& block = cache_set.get_block(i);
+        if (block.get_tag() == tag && block.is_valid()) {
+            return i;
+        }
+    }
+    return -1; //error: block not found
+}

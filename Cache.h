@@ -22,6 +22,7 @@ class Cache {
         int store_hits;
         int store_misses;
         int total_cycles;
+        uint32_t timestamp;
 
         //cache is a vector containing sets
         std::vector<Set> sets;;
@@ -43,6 +44,8 @@ class Cache {
         //TODO: add lookup method 
         std::string lookup(uint32_t set_index, uint32_t tag);
         //TODO: add lru logic (method?)
+
+        int get_block_index(uint32_t set_index, uint32_t tag);
 
 };
 #endif

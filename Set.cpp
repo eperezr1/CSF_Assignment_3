@@ -2,6 +2,6 @@
 
 Set::Set(int num_blocks) : blocks(num_blocks) {}
 
-std::vector<Block> Set::get_blocks() {
-    return blocks;
+Block& Set::get_block(int index) {
+    return blocks[index];
 }
