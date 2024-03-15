@@ -31,6 +31,10 @@ class Block {
 
     void set_dirty(bool t_f);
 
+    uint32_t get_access_time();
+
+    void set_tag(uint32_t new_tag);
+
 };
 
 #endif

@@ -35,3 +35,13 @@ bool Block::is_dirty() const {
 void Block::set_dirty(bool t_f) {
   dirty = t_f;
 }
+
+uint32_t Block::get_access_time() {
+  return access_ts;
+}
+
+void Block::set_tag(uint32_t new_tag) {
+  tag = new_tag;
+}
+
+//getter methods for load_ts and access_ts
