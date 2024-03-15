@@ -110,8 +110,7 @@ void Cache::load(uint32_t set_index, uint32_t tag) {
 // TODO: implement lookup method to refactor code out of store and load
 std::string Cache::lookup(uint32_t set_index, uint32_t tag) {
   Set &cache_set = sets[set_index];
-  for (int i = 0; i < num_blocks;
-       ++i) { // iterate through blocks in matching set to search for match
+  for (int i = 0; i < num_blocks;++i) { // iterate through blocks in matching set to search for match
     Block &block = cache_set.get_block(i);
     // if block in matching set in Cache has matching tag and is valid
     // std::cout << "block tag = " << block.get_tag() << "\n";

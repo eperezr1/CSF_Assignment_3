@@ -63,11 +63,11 @@ int main(int argc, char **argv) {
         //convert hexadecimal string to integer address
         std::istringstream(hex_string) >> std::hex >> address;
         // std::cout << "command: " << command << " address: " << address << "\n";
-
         //get the set index and tag based on the address
         uint32_t set_index = address % num_sets;
-        uint32_t tag = address / num_sets;
-
+        uint32_t tag = address / num_sets; // fix tag
+        //take log 2 of num_bytes, shift right by that number
+        //int shift = log2(num_bytes); // why? to get correct address
         //use set_index and tag to see if there is cache hit or miss?
         //implement lookup method? 
 
