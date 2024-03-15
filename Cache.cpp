@@ -30,30 +30,32 @@ void Cache::store(uint32_t set_index, uint32_t tag) {
     sets[set_index]
         .get_block(block_index)
         .update_access_ts(timeclock); // update timestamp of block
-
-  } else { // miss
+  } else {                            // miss
     store_misses++;
     if (alloc == "write-allocate") {
       // bring block into cache before store proceeds (same functionality as
       // load, so just call load)
       load(set_index, tag);
       total_loads--; // avoid double total_loads
-    }
+    } // if no-write allocate, write straight to memory without loading to cache
+      // ( the guaranteed valid combo is no-write-allocate + write-through)
   }
   // check if its write-through: write to both cache and memory
   if (through_back == "write-back") {
-    // write to cache only and mark block as dirty
+    // write to cache only and mark block as dirty ( still need to check if
+    // cache full?)
     int block_index = get_block_index(set_index, tag);
-    sets[set_index].get_block(block_index).set_dirty(true);
-    total_cycles++;
+    sets[set_index]
+        .get_block(block_index)
+        .set_dirty(true); // also set valid and set tag if its a miss?
+    total_cycles++;       // cache only
   } else if (through_back == "write-through") {
-    // write to both cache and memory
+    // write to memory ( if hit already in cache. If miss, then if
+    // write-allocate, already loaded to cache and if no-write allocate then
+    // shouldn't load to cache)
     total_cycles += 100; // bc we're not moving entire block
   }
   // add functionality to update lru "timestamps"
-  // update cycles: stores to cache take 1 cycle, stores to memory take 100
-  // cycles for every 4 bytes
-  //  add in functionality to set block to valid if added to the Cache
   timeclock++;
   total_stores++;
 }
@@ -79,9 +81,12 @@ void Cache::load(uint32_t set_index, uint32_t tag) {
 
     if (find_empty_block_index(set_index) == -1) { // set full
       // update tag and valid, load, and access
-      int evict_index = sets[set_index].lru_evict(); // find block with lowest ts
-      //if block to evict "dirty" and write-back, update main memory before "evicting"
-      if (sets[set_index].get_block(evict_index).is_dirty() && through_back == "write-back") {
+      int evict_index =
+          sets[set_index].lru_evict(); // find block with lowest ts
+      // if block to evict "dirty" and write-back, update main memory before
+      // "evicting"
+      if (sets[set_index].get_block(evict_index).is_dirty() &&
+          through_back == "write-back") {
         total_cycles += 100 * (num_bytes / 4);
       }
       Block &new_block = sets[set_index].get_block(evict_index);
@@ -98,19 +103,21 @@ void Cache::load(uint32_t set_index, uint32_t tag) {
       new_block.set_dirty(false);
       new_block.update_access_ts(timeclock);
       new_block.update_load_ts(timeclock);
-
     }
-     load_misses++;
-      total_cycles += 100 * (num_bytes / 4); // loads from memory take 100 cycles per 4 bytes
+    load_misses++;
+    total_cycles++;
+    total_cycles +=
+        100 * (num_bytes / 4); // loads from memory take 100 cycles per 4 bytes
   }
-
+  timeclock++;
   total_loads++; // increment total loads
 }
 
 // TODO: implement lookup method to refactor code out of store and load
 std::string Cache::lookup(uint32_t set_index, uint32_t tag) {
   Set &cache_set = sets[set_index];
-  for (int i = 0; i < num_blocks;++i) { // iterate through blocks in matching set to search for match
+  for (int i = 0; i < num_blocks;
+       ++i) { // iterate through blocks in matching set to search for match
     Block &block = cache_set.get_block(i);
     // if block in matching set in Cache has matching tag and is valid
     // std::cout << "block tag = " << block.get_tag() << "\n";
