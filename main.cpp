@@ -66,8 +66,8 @@ int main(int argc, char **argv) {
     std::istringstream(hex_string) >> std::hex >> address;
 
     // get the number of offset, index, and tag bits
-    uint32_t num_offset_bits = log2(num_bytes);
-    uint32_t num_index_bits = log2(num_bytes * num_blocks);
+    uint32_t num_offset_bits = ceil(log2(num_bytes));
+    uint32_t num_index_bits = ceil(log2(num_sets));
 
     //use a mask to extract only the index bits
     uint32_t index_mask = (1 << num_index_bits) - 1;

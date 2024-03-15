@@ -36,6 +36,7 @@ void Cache::store(uint32_t set_index, uint32_t tag) {
       // bring block into cache before store proceeds (same functionality as
       // load, so just call load)
       load(set_index, tag);
+      load_misses--;
       total_loads--; // avoid double total_loads
     } // if no-write allocate, write straight to memory without loading to cache
       // ( the guaranteed valid combo is no-write-allocate + write-through)
@@ -69,6 +70,7 @@ void Cache::load(uint32_t set_index, uint32_t tag) {
     // get block index and update load timestamp
     int block_index = get_block_index(set_index, tag);
     sets[set_index].get_block(block_index).update_load_ts(timeclock);
+    sets[set_index].get_block(block_index).update_access_ts(timeclock);
     load_hits++;
     total_cycles++; // loads from cache take 1 cycle
   } else {
@@ -105,7 +107,6 @@ void Cache::load(uint32_t set_index, uint32_t tag) {
       new_block.update_load_ts(timeclock);
     }
     load_misses++;
-    total_cycles++;
     total_cycles +=
         100 * (num_bytes / 4); // loads from memory take 100 cycles per 4 bytes
   }

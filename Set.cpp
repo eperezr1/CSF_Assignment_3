@@ -16,6 +16,7 @@ int Set::lru_evict() { // return index of block to evict, so in cache we can add
     int index = 0;
     for (Block& block: blocks) {
         if (block.get_access_time() < min_access_time) {    
+            min_access_time = block.get_access_time();
             lru_index = index;
         }
         index++;
