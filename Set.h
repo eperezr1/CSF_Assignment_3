@@ -7,17 +7,21 @@
 class Set {
   private:
     std::vector<Block> blocks;
-    int num_blocks; //new, added for add_block
+    int num_blocks; 
 
   public:
-    //Set constructor
+    //Set constructor, initializes blocks vector with num_blocks elements
     Set(int num_blocks);
     
-    //get block method?
+    // Returns block at index 'index' of blocks vector
+    // Returns:
+    // Block at index index of the set
     Block& get_block(int index);
 
-    void add_block(uint32_t tag); // add new block to current set and lru evict logic?
-
+  // Iterates through blocks in set, finds the block with the lowest
+  //   access timestamp, and returns the index of that block
+  // Returns:
+  //   index of block to evict
     int lru_evict();
 
   

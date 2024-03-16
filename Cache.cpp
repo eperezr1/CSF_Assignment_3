@@ -22,83 +22,60 @@ void Cache::printStats() {
 }
 
 void Cache::store(uint32_t set_index, uint32_t tag) {
-  // cache store method (store to memory)
   // check if block in cache has matching tag and is valid
-  if (lookup(set_index, tag) == "hit") { // either write through or write back
+  if (lookup(set_index, tag) == "hit") {
     store_hits++;
     int block_index = get_block_index(set_index, tag);
-    sets[set_index]
-        .get_block(block_index)
-        .update_access_ts(timeclock); // update timestamp of block
-  } else {                            // miss
+    sets[set_index].get_block(block_index).update_access_ts(timeclock); // update timestamp of block
+  } else { // miss
     store_misses++;
     if (alloc == "write-allocate") {
-      // bring block into cache before store proceeds (same functionality as
-      // load, so just call load)
+      // bring block into cache before store proceeds (same functionality as load, so just call load)
       load(set_index, tag);
       load_misses--;
       total_loads--; // avoid double total_loads
-    } // if no-write allocate, write straight to memory without loading to cache
-      // ( the guaranteed valid combo is no-write-allocate + write-through)
+    } 
   }
   // check if its write-through: write to both cache and memory
   if (through_back == "write-back") {
-    // write to cache only and mark block as dirty ( still need to check if
-    // cache full?)
+    // write to cache only and mark block as dirty
     int block_index = get_block_index(set_index, tag);
-    sets[set_index]
-        .get_block(block_index)
-        .set_dirty(true); // also set valid and set tag if its a miss?
-    total_cycles++;       // cache only
+    sets[set_index].get_block(block_index).set_dirty(true); 
+    total_cycles++; // cache only
   } else if (through_back == "write-through") {
-    // write to memory ( if hit already in cache. If miss, then if
-    // write-allocate, already loaded to cache and if no-write allocate then
-    // shouldn't load to cache)
+    // write to memory
     total_cycles += 100; // bc we're not moving entire block
   }
-  // add functionality to update lru "timestamps"
   timeclock++;
   total_stores++;
 }
 
-// cache load method (load data from memory)
 void Cache::load(uint32_t set_index, uint32_t tag) {
   // check if block in cache has matching tag and is valid (hit), else miss
-  //   std::string str = lookup(set_index, tag);
-  // std::cout << str;
   if (lookup(set_index, tag) == "hit") {
-    // get block index and update load timestamp
+    // get block index and update load and access timestamps
     int block_index = get_block_index(set_index, tag);
     sets[set_index].get_block(block_index).update_load_ts(timeclock);
     sets[set_index].get_block(block_index).update_access_ts(timeclock);
     load_hits++;
     total_cycles++; // loads from cache take 1 cycle
   } else {
-    // find an empty block in the set, make into method?
-    // if an empty block is found, update the block with tag and set valid to
-    // true if write-back, mark block as dirty if no empty blocks, evict a
-    // block, then add new block
-    // get_blocks vector
-    // get size of blocks_vector
-
     if (find_empty_block_index(set_index) == -1) { // set full
       // update tag and valid, load, and access
-      int evict_index =
-          sets[set_index].lru_evict(); // find block with lowest ts
-      // if block to evict "dirty" and write-back, update main memory before
-      // "evicting"
-      if (sets[set_index].get_block(evict_index).is_dirty() &&
-          through_back == "write-back") {
+      int evict_index = sets[set_index].lru_evict(); // find block with lowest ts
+      // if block to evict "dirty" and write-back, update main memory before "evicting"
+      if (sets[set_index].get_block(evict_index).is_dirty() && through_back == "write-back") {
         total_cycles += 100 * (num_bytes / 4);
       }
+      //update block at evict_index to be new block
       Block &new_block = sets[set_index].get_block(evict_index);
       new_block.set_tag(tag);
       new_block.set_dirty(false);
       new_block.update_access_ts(timeclock);
       new_block.update_load_ts(timeclock);
-    } else { // set not full, just add block
-             //   std::cout << "debugging\n";
+    } else { // set not full, just add block at empty index
       int block_index = find_empty_block_index(set_index);
+      //update block at the empty to be new block
       Block &new_block = sets[set_index].get_block(block_index);
       new_block.set_tag(tag);
       new_block.set_valid(true);
@@ -107,22 +84,17 @@ void Cache::load(uint32_t set_index, uint32_t tag) {
       new_block.update_load_ts(timeclock);
     }
     load_misses++;
-    total_cycles +=
-        100 * (num_bytes / 4); // loads from memory take 100 cycles per 4 bytes
+    total_cycles += 100 * (num_bytes / 4); // loads from memory take 100 cycles per 4 bytes
   }
   timeclock++;
   total_loads++; // increment total loads
 }
 
-// TODO: implement lookup method to refactor code out of store and load
 std::string Cache::lookup(uint32_t set_index, uint32_t tag) {
   Set &cache_set = sets[set_index];
-  for (int i = 0; i < num_blocks;
-       ++i) { // iterate through blocks in matching set to search for match
+  for (int i = 0; i < num_blocks; ++i) { // iterate through blocks in matching set to search for match
     Block &block = cache_set.get_block(i);
     // if block in matching set in Cache has matching tag and is valid
-    // std::cout << "block tag = " << block.get_tag() << "\n";
-    // std::cout << "tag = " << tag << "\n";
     if (block.get_tag() == tag && block.is_valid()) {
       return "hit";
     }
@@ -130,7 +102,6 @@ std::string Cache::lookup(uint32_t set_index, uint32_t tag) {
   return "miss"; // no matching block found
 }
 
-// helper method to get block index provided index and tag
 int Cache::get_block_index(uint32_t set_index, uint32_t tag) {
   Set &cache_set = sets[set_index];
   for (int i = 0; i < num_blocks; ++i) {
@@ -142,12 +113,11 @@ int Cache::get_block_index(uint32_t set_index, uint32_t tag) {
   return -1; // error: block not found
 }
 
-// method to find empty block index in cache
 int Cache::find_empty_block_index(uint32_t set_index) {
   Set &cache_set = sets[set_index];
   for (int i = 0; i < num_blocks; ++i) {
     Block &block = cache_set.get_block(i);
-    if (!block.is_valid()) {
+    if (!block.is_valid()) { // only check that block is not valid
       return i;
     }
   }
