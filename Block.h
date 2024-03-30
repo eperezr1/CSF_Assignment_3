@@ -24,7 +24,7 @@ class Block {
     // lts - load timestamp
     // ats - access timestamp
     // d - dirty
-    Block(uint32_t t, bool v, uint32_t lts, uint32_t ats, bool d);
+    Block(uint32_t t, bool v, uint32_t lts, uint32_t ats, bool d, uint32_t its);
 
     // gets tag of block
     //Returns:
@@ -66,11 +66,14 @@ class Block {
     // access_ts - value of the access timestamp of the block
     uint32_t get_access_time();
 
+    uint32_t get_load_time();
+
     // Sets the value of a block's tag
     // Parameters:
     //  new_tag - value to set block's tag to
     void set_tag(uint32_t new_tag);
 
+   
 };
 
 #endif

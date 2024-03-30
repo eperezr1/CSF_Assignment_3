@@ -55,14 +55,19 @@ void Cache::load(uint32_t set_index, uint32_t tag) {
   if (lookup(set_index, tag) == "hit") {
     // get block index and update load and access timestamps
     int block_index = get_block_index(set_index, tag);
-    sets[set_index].get_block(block_index).update_load_ts(timeclock);
+    //sets[set_index].get_block(block_index).update_load_ts(timeclock); // commented out bc causing error with fifo
     sets[set_index].get_block(block_index).update_access_ts(timeclock);
     load_hits++;
     total_cycles++; // loads from cache take 1 cycle
   } else {
     if (find_empty_block_index(set_index) == -1) { // set full
       // update tag and valid, load, and access
-      int evict_index = sets[set_index].lru_evict(); // find block with lowest ts
+      int evict_index;
+      if (lru_fifo == "lru") { // check type
+        evict_index = sets[set_index].lru_evict(); // find block with lowest access ts
+      } else if (lru_fifo == "fifo") {
+        evict_index = sets[set_index].fifo_evict();
+      }
       // if block to evict "dirty" and write-back, update main memory before "evicting"
       if (sets[set_index].get_block(evict_index).is_dirty() && through_back == "write-back") {
         total_cycles += 100 * (num_bytes / 4);

@@ -3,7 +3,7 @@
 
 Block::Block() : tag(0) , valid(false), load_ts(0), access_ts(0), dirty(false) {}
 
-Block::Block(uint32_t t, bool v, uint32_t lts, uint32_t ats, bool d) 
+Block::Block(uint32_t t, bool v, uint32_t lts, uint32_t ats, bool d, uint32_t its) 
   : tag(t), valid(v), load_ts(lts), access_ts(ats), dirty(d) {}
 
 
@@ -39,6 +39,11 @@ uint32_t Block::get_access_time() {
   return access_ts;
 }
 
+uint32_t Block::get_load_time() {
+  return load_ts;
+}
+
 void Block::set_tag(uint32_t new_tag) {
   tag = new_tag;
 }
+
