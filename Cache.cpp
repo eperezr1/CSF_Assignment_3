@@ -55,7 +55,6 @@ void Cache::load(uint32_t set_index, uint32_t tag) {
   if (lookup(set_index, tag) == "hit") {
     // get block index and update load and access timestamps
     int block_index = get_block_index(set_index, tag);
-    //sets[set_index].get_block(block_index).update_load_ts(timeclock); // commented out bc causing error with fifo
     sets[set_index].get_block(block_index).update_access_ts(timeclock);
     load_hits++;
     total_cycles++; // loads from cache take 1 cycle
